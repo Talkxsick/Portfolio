@@ -49,9 +49,16 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
   },
 
   closeWindow: (id) => set(state => ({
-    windows: { ...state.windows, [id]: { ...state.windows[id], isOpen: false } }
+    windows: {
+      ...state.windows,
+      [id]: {
+        ...state.windows[id],
+        isOpen: false,
+        isMinimized: false,
+      }
+    }
   })),
-
+  
   minimizeWindow: (id) => set(state => ({
     windows: { ...state.windows, [id]: { ...state.windows[id], isMinimized: true } }
   })),
@@ -59,9 +66,17 @@ export const useWindowStore = create<WindowStore>((set, get) => ({
   focusWindow: (id) => {
     const { highestZ } = get()
     const newZ = highestZ + 1
+  
     set(state => ({
       highestZ: newZ,
-      windows: { ...state.windows, [id]: { ...state.windows[id], zIndex: newZ } }
+      windows: {
+        ...state.windows,
+        [id]: {
+          ...state.windows[id],
+          zIndex: newZ,
+          isMinimized: false,
+        }
+      }
     }))
   },
 

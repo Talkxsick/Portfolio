@@ -2,24 +2,29 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWindowStore } from '@/store/windowStore'
+import { playBootTick, playBootPowerOn, playBootComplete, playDesktopTransition} from '@/components/SoundEngine'
 
 const BOOT_SEQUENCE = [
-  { delay: 0,    text: '> INITIALIZING PM/OS KERNEL..................... [ OK ]' },
-  { delay: 300,  text: '> LOADING SYSTEM MODULES......................... [ OK ]' },
-  { delay: 550,  text: '> MOUNTING FILE SYSTEMS.......................... [ OK ]' },
-  { delay: 750,  text: '> STARTING PROCESS SCHEDULER..................... [ OK ]' },
-  { delay: 950,  text: '> INITIALIZING GPU DRIVERS....................... [ OK ]' },
-  { delay: 1150, text: '> LOADING CUDA RUNTIME........................... [ OK ]' },
-  { delay: 1350, text: '> CALIBRATING DISPLAY MATRICES................... [ OK ]' },
-  { delay: 1550, text: '> STARTING WINDOW COMPOSITOR..................... [ OK ]' },
-  { delay: 1800, text: '─────────────────────────────────────────────────────' },
-  { delay: 2000, text: '> SYSTEM SCAN COMPLETE' },
-  { delay: 2200, text: '> ENTITY   : PRIYANSH MISHRA' },
-  { delay: 2400, text: '> CLASS    : C++ SYSTEMS ENGINEER // HPC // CUDA' },
-  { delay: 2600, text: '> STATUS   : ONLINE' },
-  { delay: 2800, text: '> LOCATION : DELHI, INDIA' },
-  { delay: 3000, text: '─────────────────────────────────────────────────────' },
-  { delay: 3200, text: '> LAUNCHING PM/OS................................ [ OK ]' },
+  { delay: 0,    text: '> INITIALIZING CHA.OS KERNEL..................... [ OK ]' },
+  { delay: 180,  text: '> LOADING SYSTEM MODULES......................... [ OK ]' },
+  { delay: 340,  text: '> MOUNTING FILE SYSTEMS.......................... [ OK ]' },
+  { delay: 500,  text: '> STARTING PROCESS SCHEDULER..................... [ OK ]' },
+  { delay: 660,  text: '> INITIALIZING GPU DRIVERS....................... [ OK ]' },
+  { delay: 820,  text: '> LOADING CUDA RUNTIME........................... [ OK ]' },
+  { delay: 980,  text: '> CALIBRATING DISPLAY MATRICES................... [ OK ]' },
+  { delay: 1140, text: '> STARTING WINDOW COMPOSITOR..................... [ OK ]' },
+
+  { delay: 1320, text: '─────────────────────────────────────────────────────' },
+
+  { delay: 1480, text: '> SYSTEM SCAN COMPLETE' },
+  { delay: 1640, text: '> ENTITY   : PRIYANSH MISHRA' },
+  { delay: 1800, text: '> CLASS    : C++ SYSTEMS ENGINEER // HPC // CUDA' },
+  { delay: 1960, text: '> STATUS   : ONLINE' },
+  { delay: 2120, text: '> LOCATION : DELHI, INDIA' },
+
+  { delay: 2280, text: '─────────────────────────────────────────────────────' },
+
+  { delay: 2500, text: '> LAUNCHING CHA.OS................................ [ OK ]' },
 ]
 
 export default function BootScreen() {
@@ -31,18 +36,25 @@ export default function BootScreen() {
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = []
 
+    // Power on sound at start
+    timers.push(setTimeout(() => { try { playBootPowerOn() } catch {} }, 100))
+
     BOOT_SEQUENCE.forEach((item, i) => {
       timers.push(setTimeout(() => {
         setVisibleLines(prev => [...prev, item.text])
         setProgress(Math.round(((i + 1) / BOOT_SEQUENCE.length) * 100))
+        try { playBootTick() } catch {}
       }, item.delay))
     })
 
     // Complete after last line
     timers.push(setTimeout(() => {
+      try { playBootComplete() 
+          setTimeout(() => { playDesktopTransition() }, 150)
+      } catch {}
       setDone(true)
       setTimeout(setBootComplete, 800)
-    }, 3800))
+    }, 2600))
 
     return () => timers.forEach(clearTimeout)
   }, [setBootComplete])
@@ -53,7 +65,7 @@ export default function BootScreen() {
         <motion.div
           key="boot"
           className="scanlines"
-          exit={{ opacity: 0, transition: { duration: 0.8 } }}
+          exit={{ opacity: 0, transition: { duration: 0.4 } }}
           style={{
             position: 'fixed', inset: 0, zIndex: 9000,
             background: '#000000',
@@ -77,7 +89,7 @@ export default function BootScreen() {
             paddingTop: 8,
           }}>
             <span style={{ color: 'rgba(57,255,20,0.5)', fontSize: 10, fontFamily: 'Share Tech Mono, monospace', letterSpacing: 3 }}>
-              PM/OS v1.0.0
+              CHA.OS v1.0.0
             </span>
             <span style={{ color: 'rgba(57,255,20,0.5)', fontSize: 10, fontFamily: 'Share Tech Mono, monospace', letterSpacing: 3 }}>
               BOOT SEQUENCE

@@ -5,9 +5,10 @@ import Window from '@/components/Window'
 interface Line {
   type: 'input' | 'output' | 'error' | 'system'
   text: string
+  command?: string
 }
 
-const PROMPT = 'priyansh@pm-os:~$'
+const PROMPT = 'priyansh@cha-os:~$'
 
 const COMMANDS: Record<string, string[]> = {
   whoami: [
@@ -70,7 +71,7 @@ const COMMANDS: Record<string, string[]> = {
 }
 
 const BOOT_LINES: Line[] = [
-  { type: 'system', text: '// PM/OS TERMINAL v1.0.0' },
+  { type: 'system', text: '// CHA.OS TERMINAL v1.0.0' },
   { type: 'system', text: '// TYPE "help" FOR AVAILABLE COMMANDS' },
   { type: 'system', text: '────────────────────────────────────────' },
 ]
@@ -82,6 +83,7 @@ export default function Terminal() {
   const [histIdx, setHistIdx] = useState(-1)
   const bottomRef             = useRef<HTMLDivElement>(null)
   const inputRef              = useRef<HTMLInputElement>(null)
+  const [hasExecutedCommand, setHasExecutedCommand] = useState(false)
 
   useEffect(() => {
     let i = 0
@@ -96,7 +98,11 @@ export default function Terminal() {
 
   const runCommand = (cmd: string) => {
     const trimmed = cmd.trim().toLowerCase()
-    const inputLine: Line = { type: 'input', text: `${PROMPT} ${cmd}` }
+    const inputLine: Line = {
+      type: 'input',
+      text: PROMPT,
+      command: cmd,
+    }
     if (trimmed === 'clear') { setLines([]); return }
     if (trimmed === '') { setLines(prev => [...prev, inputLine]); return }
     const output = COMMANDS[trimmed]
@@ -110,8 +116,15 @@ export default function Terminal() {
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       const cmd = input.trim()
-      if (cmd) setHistory(prev => [cmd, ...prev])
-      setHistIdx(-1); runCommand(input); setInput('')
+    
+      if (cmd) {
+        setHistory(prev => [cmd, ...prev])
+        setHasExecutedCommand(true)
+      }
+    
+      setHistIdx(-1)
+      runCommand(input)
+      setInput('')
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       const next = Math.min(histIdx + 1, history.length - 1)
@@ -124,11 +137,11 @@ export default function Terminal() {
   }
 
   const lineColor = (type?: Line['type']) => {
-    if (!type)             return 'rgba(255,255,255,0.7)'
+    if (!type)             return 'rgba(255, 255, 255, 0.7)'
     if (type === 'input')  return '#ffffff'
     if (type === 'error')  return '#f87171'
-    if (type === 'system') return 'rgba(6,182,212,0.8)'
-    return 'rgba(255,255,255,0.65)'
+    if (type === 'system') return 'rgba(208, 222, 16, 0.85)'
+    return 'rgba(255, 255, 255, 0.65)'
   }
 
   return (
@@ -136,14 +149,55 @@ export default function Terminal() {
       <div style={{ height: '100%', cursor: 'text', display: 'flex', flexDirection: 'column' }}
         onClick={() => inputRef.current?.focus()}>
         <div style={{ flex: 1, overflow: 'auto', lineHeight: 1.8 }}>
-          {lines.map((line, i) => (
-            <div key={i} style={{ color: lineColor(line?.type), fontFamily: 'Share Tech Mono, monospace', fontSize: 12, whiteSpace: 'pre' }}>
-              {line?.text}
-            </div>
-          ))}
-          <div style={{ display: 'flex', alignItems: 'center', fontFamily: 'Share Tech Mono, monospace', fontSize: 12 }}>
-            <span style={{ color: '#06b6d4', marginRight: 8 }}>{PROMPT}</span>
-            <input
+        {lines.map((line, i) => (
+  <div
+    key={i}
+    style={{
+      fontFamily: 'Share Tech Mono, monospace',
+      fontSize: 12,
+      whiteSpace: 'pre',
+    }}
+  >
+    {line?.type === 'input'? (
+      <>
+        <span style={{ color: '#39ff14' }}>{line.text}</span>
+        <span style={{ color: '#ffffff' }}>
+          {line.command ? ` ${line?.command}` : ''}
+        </span>
+      </>
+    ) : (
+      <span style={{ color: lineColor(line?.type) }}>
+        {line?.text}
+      </span>
+    )}
+  </div>
+))}
+          <div
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    fontFamily: 'Share Tech Mono, monospace',
+    fontSize: 12,
+    position: 'relative',
+  }}
+>
+  <span style={{ color: '#39ff14', marginRight: 8 }}>{PROMPT}</span>
+
+  {!input && !hasExecutedCommand && (
+    <span
+      style={{
+        position: 'absolute',
+        left: 125,
+        color: 'rgba(255,255,255,0.25)',
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }}
+    >
+      Type 'help' to explore commands.
+    </span>
+  )}
+
+  <input
               ref={inputRef} value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={onKeyDown} autoFocus

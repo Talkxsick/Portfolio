@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import "tailwindcss";
 
 :root {
   --black:        #000000;
@@ -9,9 +11,9 @@
   --dark-3:       #1a1a1a;
   --phosphor:     #39ff14;
   --phosphor-dim: #1a7a09;
-  --teal:         #06b6d4;
-  --purple:       #7c3aed;
-  --purple-light: #a855f7;
+  --teal:         #ffd700;
+  --orange:       #ff6b00;
+  --purple-light: #ffd700;
   --white:        #f0f0f0;
   --white-dim:    rgba(240,240,240,0.6);
   --grid-color:   rgba(255,255,255,0.03);
@@ -160,3 +162,6 @@ body::before {
   to   { transform: translateX(-50%); }
 }
 .ticker-track { animation: ticker 20s linear infinite; }
+
+/* Hide default cursor over nucleus area — custom crosshair takes over */
+.nucleus-active { cursor: none !important; }
