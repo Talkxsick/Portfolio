@@ -170,9 +170,8 @@ export default function Desktop() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
             style={{
-              position: 'absolute', left: 20, top: 0, bottom: 0,
-              margin: 'auto 0',
-              display: 'flex', flexDirection: 'column', gap: 4,
+              position: 'absolute', left: 20, top: topBarHeight, bottom: 60,
+              display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4,
               zIndex: 30,
             }}
           >
@@ -221,9 +220,8 @@ export default function Desktop() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6 }}
             style={{
-              position: 'absolute', right: 20, top: 0, bottom: 0,
-              margin: 'auto 0',
-              display: 'flex', flexDirection: 'column', gap: 6,
+              position: 'absolute', right: 20, top: topBarHeight, bottom: 60,
+              display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6,
               zIndex: 10, width: 160,
             }}
           >
